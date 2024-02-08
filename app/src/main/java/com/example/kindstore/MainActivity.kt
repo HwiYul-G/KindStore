@@ -4,9 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.example.kindstore.ui.theme.KindStoreTheme
 
@@ -19,10 +23,27 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // Step 3 : AppNavHost를 MainActivity에서 호출
-                    AppNavHost(navController = rememberNavController())
+                    MainScreen()
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun MainScreen() {
+    val navController = rememberNavController()
+    val items = listOf(NavigationItem.Home, NavigationItem.Search, NavigationItem.BookMark)
+    Scaffold(bottomBar = {
+        BottomNavigationBar(
+            navController = navController,
+            items = items,
+        )
+    }) {
+        AppNavHost(
+            modifier = Modifier.padding(it),
+            navController = navController,
+        )
     }
 }
