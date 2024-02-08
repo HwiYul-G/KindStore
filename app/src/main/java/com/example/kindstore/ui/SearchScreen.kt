@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -149,9 +150,9 @@ private fun ListItem(imageUri: Uri, name: String, address: String) {
     }
 }
 
-@Preview
+
 @Composable
-private fun LocationSearchDialog(
+fun LocationSearchDialog(
 
 ) {
     Dialog(onDismissRequest = { }) {
@@ -179,7 +180,7 @@ private fun LocationSearchDialog(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
-                LocationDropdownMenu()
+                LocationDropdownMenu(locations = stringArrayResource(id = R.array.address_array))
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(
@@ -210,7 +211,7 @@ private fun LocationSearchDialog(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LocationDropdownMenu(modifier: Modifier = Modifier) {
+private fun LocationDropdownMenu(locations : Array<String>, modifier: Modifier = Modifier) {
     var isExpanded by remember { mutableStateOf(false) }
     var category by remember { mutableStateOf("") }
     ExposedDropdownMenuBox(
@@ -231,18 +232,20 @@ private fun LocationDropdownMenu(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        DropdownMenuItem(
-            text = { Text("전체") },
-            onClick = {
-                category = "전체"
-                isExpanded = false
-            }
-        )
+        locations.forEachIndexed { index, s ->
+            DropdownMenuItem(
+                text = { Text(s) },
+                onClick = {
+                    category = s
+                    isExpanded = false
+                }
+            )
+        }
     }
 }
 
 @Composable
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 fun PreviewSearchScreen() {
     SearchScreen()
 }
