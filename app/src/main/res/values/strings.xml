@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">서울 착한 가게</string>
 
+    <!-- Navigation -->
+    <string name="home">홈</string>
+    <string name="search">검색</string>
+    <string name="bookmark">즐겨 찾기</string>
+
     <!-- Home Screen -->
     <string name="what_is_good_shop_title">착한가격업소란?</string>
     <string name="what_is_good_shop_content">
