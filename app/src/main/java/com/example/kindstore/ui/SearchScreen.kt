@@ -1,6 +1,8 @@
 package com.example.kindstore.ui
 
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,7 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.text.font.FontWeight
@@ -82,9 +87,24 @@ fun SearchScreen() {
                 )
             }
         }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "검색 결과",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
+        )
 
-        // searchedShopList 넣어야함.
-        // SearchResults()
+        val shopInfoList = listOf(
+            ShopInfo("AAA", "메롱동", "이미지 주소"),
+            ShopInfo("AAA", "메롱동", "이미지 주소"),
+            ShopInfo("AAA", "메롱동", "이미지 주소"),
+            ShopInfo("AAA", "메롱동", "이미지 주소"),
+            ShopInfo("AAA", "메롱동", "이미지 주소"),
+        )
+        SearchResults(shopInfoList, modifier = Modifier.weight(1f))
     }
 
 }
@@ -124,7 +144,7 @@ private fun CategoryDropdownMenu(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SearchResults(searchedShopList : List<ShopInfo>, modifier: Modifier = Modifier) {
+private fun SearchResults(searchedShopList: List<ShopInfo>, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier) {
         items(searchedShopList.size) { index ->
             ShopCard(shopInfo = searchedShopList[index])
@@ -135,16 +155,32 @@ private fun SearchResults(searchedShopList : List<ShopInfo>, modifier: Modifier 
 
 @Composable
 private fun ShopCard(shopInfo: ShopInfo, modifier: Modifier = Modifier) {
-    Card(modifier = Modifier) {
-        Row(){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
             // TODO : 이미지 관련 처리 필요
-//            Image(
-//                painter = painterResource(shopInfo.imageUri),
-//                contentDescription = "${shopInfo.title} 가게 이미지"
-//            )
+            Image(
+                painter = painterResource(id = R.drawable.my_location),
+                contentDescription = "${shopInfo.title} 가게 이미지",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(80.dp)
+                    .background(Color.White)
+                    .padding(12.dp)
+                    .clip(RoundedCornerShape(20.dp)),
+            )
+            Spacer(modifier = Modifier.width(12.dp))
             Column {
-                Text(text = shopInfo.title)
-                Text(text = shopInfo.address)
+                Text(text = shopInfo.title, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = shopInfo.address, fontSize = 14.sp)
             }
         }
     }
@@ -187,7 +223,7 @@ fun LocationSearchDialog(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Button(onClick = { /*TODO*/ }) {
-                        Row(verticalAlignment = Alignment.CenterVertically){
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 painter = painterResource(id = R.drawable.my_location),
                                 contentDescription = "현재 위치로 설정"
@@ -210,7 +246,7 @@ fun LocationSearchDialog(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LocationDropdownMenu(locations : Array<String>, modifier: Modifier = Modifier) {
+private fun LocationDropdownMenu(locations: Array<String>, modifier: Modifier = Modifier) {
     var isExpanded by remember { mutableStateOf(false) }
     var category by remember { mutableStateOf("") }
     ExposedDropdownMenuBox(
