@@ -1,6 +1,6 @@
 package com.example.kindstore.ui
 
-import android.net.Uri
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.kindstore.R
+import com.example.kindstore.model.ShopInfo
 
 @Composable
 fun SearchScreen() {
@@ -81,8 +83,8 @@ fun SearchScreen() {
             }
         }
 
-        // 검색 결과를 보여주는 RecyclerView
-        // SearchResultsRecyclerView()
+        // searchedShopList 넣어야함.
+        // SearchResults()
     }
 
 }
@@ -121,35 +123,32 @@ private fun CategoryDropdownMenu(modifier: Modifier = Modifier) {
     }
 }
 
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//private fun SearchResultsRecyclerView(modifier: Modifier = Modifier) {
-//    Column {
-//        Text(text = "검색 결과")
-//        LazyColumn(content = ){
-//
-//        }
-//
-//    }
-//
-//}
-
 @Composable
-private fun ListItem(imageUri: Uri, name: String, address: String) {
-    Surface(
-        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-    ) {
-        Row {
-            // TODO : Coil 등 라이브러리로 Uri를 이미지로 변환
-            // Image(painter =, contentDescription = "${name} 이미지")
-            Column {
-                Text(text = name)
-                Text(text = address)
-            }
+private fun SearchResults(searchedShopList : List<ShopInfo>, modifier: Modifier = Modifier) {
+    LazyColumn(modifier = modifier) {
+        items(searchedShopList.size) { index ->
+            ShopCard(shopInfo = searchedShopList[index])
         }
     }
 }
 
+
+@Composable
+private fun ShopCard(shopInfo: ShopInfo, modifier: Modifier = Modifier) {
+    Card(modifier = Modifier) {
+        Row(){
+            // TODO : 이미지 관련 처리 필요
+//            Image(
+//                painter = painterResource(shopInfo.imageUri),
+//                contentDescription = "${shopInfo.title} 가게 이미지"
+//            )
+            Column {
+                Text(text = shopInfo.title)
+                Text(text = shopInfo.address)
+            }
+        }
+    }
+}
 
 @Composable
 fun LocationSearchDialog(
@@ -245,7 +244,7 @@ private fun LocationDropdownMenu(locations : Array<String>, modifier: Modifier =
 }
 
 @Composable
-//@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true)
 fun PreviewSearchScreen() {
     SearchScreen()
 }
