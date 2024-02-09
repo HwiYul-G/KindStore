@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-    val items = listOf(NavigationItem.Home, NavigationItem.Search, NavigationItem.BookMark)
+    val items = listOf(BottomNavigationItem.Home, BottomNavigationItem.Search, BottomNavigationItem.BookMark)
     Scaffold(bottomBar = {
         BottomNavigationBar(
             navController = navController,
