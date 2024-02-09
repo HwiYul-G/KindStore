@@ -24,13 +24,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.kindstore.NavigationItem
@@ -56,32 +58,43 @@ import com.example.kindstore.model.ShopRepo
 import com.example.kindstore.model.shops
 
 @Composable
-fun SearchScreen(navController : NavHostController) {
+fun SearchScreen(
+    navController: NavHostController,
+    searchViewModel: SearchViewModel = viewModel()
+) {
+    val searchUiState by searchViewModel.uiState.collectAsState()
     Column(
         modifier = Modifier
             .padding(4.dp)
             .fillMaxWidth(),
     ) {
         // 검색창 관련
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    painterResource(id = R.drawable.my_location),
-                    contentDescription = "현재 위치 검색 버튼"
-                )
-            }
-            Text(text = "현재 위치")
+        val showLocationDialog = remember { mutableStateOf(false) }
+        if (showLocationDialog.value) {
+            LocationSearchDialog(
+                searchUiState.location,
+                searchViewModel,
+                onDismissRequest = { showLocationDialog.value = false })
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            CategoryDropdownMenu(modifier = Modifier.weight(8.5f))
+            IconButton(onClick = { showLocationDialog.value = true }) {
+                Icon(
+                    painterResource(id = R.drawable.my_location),
+                    contentDescription = "현재 위치 검색 버튼",
+                )
+            }
+            Text(text = searchUiState.location)
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            CategoryDropdownMenu(searchViewModel, modifier = Modifier.weight(8.5f))
             IconButton(
-                onClick = { /*TODO*/ },
+                onClick = { /*TODO searchViewModel.getShopList()*/ },
                 modifier = Modifier
                     .weight(1.5f)
                     .padding(horizontal = 4.dp),
@@ -108,42 +121,12 @@ fun SearchScreen(navController : NavHostController) {
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CategoryDropdownMenu(modifier: Modifier = Modifier) {
-    var isExpanded by remember { mutableStateOf(false) }
-    var category by remember { mutableStateOf("") }
-    ExposedDropdownMenuBox(
-        expanded = isExpanded,
-        onExpandedChange = { isExpanded = it },
-        modifier = modifier
-    ) {
-        TextField(
-            value = category,
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
-            },
-            placeholder = {
-                Text(text = "카테고리를 선택해주세요")
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // TODO : Item 추가
-//        DropdownMenuItem(
-//            text = { Text("") },
-//            onClick = {
-//                category = ""
-//                isExpanded = false
-//            }
-//        )
-    }
-}
-
-@Composable
-private fun SearchResults(searchedShopList: List<Shop>, navController : NavHostController, modifier: Modifier = Modifier) {
+private fun SearchResults(
+    searchedShopList: List<Shop>,
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(modifier = modifier) {
         items(searchedShopList.size) { index ->
             ShopCard(shopInfo = searchedShopList[index],
@@ -159,7 +142,6 @@ private fun SearchResults(searchedShopList: List<Shop>, navController : NavHostC
 private fun ShopCard(
     shopInfo: Shop,
     onItemClick: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = Modifier
@@ -195,9 +177,13 @@ private fun ShopCard(
 
 @Composable
 fun LocationSearchDialog(
-
+    location: String,
+    searchViewModel: SearchViewModel,
+    onDismissRequest: () -> Unit,
 ) {
-    Dialog(onDismissRequest = { }) {
+    Dialog(
+        onDismissRequest = { onDismissRequest() },
+    ) {
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = Color.White,
@@ -211,49 +197,93 @@ fun LocationSearchDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = "위치 설정",
+                        text = location,
                         fontSize = 18.sp, fontWeight = FontWeight.Bold
                     )
                     IconButton(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            onDismissRequest()
+                        },
                     ) {
                         Icon(imageVector = Icons.Filled.Close, contentDescription = "위치 설정 닫기 버튼")
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
-                LocationDropdownMenu(locations = stringArrayResource(id = R.array.address_array))
+                LocationDropdownMenu(location)
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(onClick = {
+                        searchViewModel.getCurrentLocation()
+                    }) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 painter = painterResource(id = R.drawable.my_location),
                                 contentDescription = "현재 위치로 설정"
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = "현재 위치")
+                            Text(text = location)
                         }
                     }
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(onClick = {
+                        searchViewModel.updateLocation(location)
+                        onDismissRequest()
+                    }) {
                         Text(text = "확인")
                     }
                 }
-
-
             }
-
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LocationDropdownMenu(locations: Array<String>, modifier: Modifier = Modifier) {
+private fun LocationDropdownMenu(location: String, modifier: Modifier = Modifier) {
+    var isExpanded by remember { mutableStateOf(false) }
+    var selectedLocation by remember { mutableStateOf(location) }
+    ExposedDropdownMenuBox(
+        expanded = isExpanded,
+        onExpandedChange = { isExpanded = it },
+        modifier = modifier
+    ) {
+        TextField(
+            value = location,
+            onValueChange = {
+                selectedLocation = it
+            },
+            readOnly = true,
+            trailingIcon = {
+                TrailingIcon(expanded = isExpanded)
+            },
+            placeholder = {
+                Text(text = "지역을 선택해주세요")
+            },
+            modifier = Modifier.menuAnchor()
+        )
+
+        ExposedDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }, modifier = Modifier.fillMaxWidth()) {
+            val locations = stringArrayResource(id = R.array.address_array)
+            locations.forEachIndexed { index, s ->
+                DropdownMenuItem(
+                    text = { Text(s) },
+                    onClick = {
+                        selectedLocation = s
+                        isExpanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CategoryDropdownMenu(searchViewModel: SearchViewModel, modifier: Modifier = Modifier) {
     var isExpanded by remember { mutableStateOf(false) }
     var category by remember { mutableStateOf("") }
     ExposedDropdownMenuBox(
@@ -263,28 +293,39 @@ private fun LocationDropdownMenu(locations: Array<String>, modifier: Modifier = 
     ) {
         TextField(
             value = category,
-            onValueChange = {},
+            onValueChange = {
+                category = it
+                searchViewModel.updateCategory(it)
+            },
             readOnly = true,
             trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+                TrailingIcon(expanded = isExpanded)
             },
             placeholder = {
-                Text(text = "지역을 선택해주세요")
+                Text(text = "카테고리를 선택해주세요")
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.menuAnchor()
         )
 
-        locations.forEachIndexed { index, s ->
-            DropdownMenuItem(
-                text = { Text(s) },
-                onClick = {
-                    category = s
-                    isExpanded = false
-                }
-            )
+        ExposedDropdownMenu(
+            expanded = isExpanded,
+            onDismissRequest = { isExpanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            val categories = stringArrayResource(id = R.array.category_array)
+            categories.forEachIndexed { index, s ->
+                DropdownMenuItem(
+                    text = { Text(s) },
+                    onClick = {
+                        category = s
+                        isExpanded = false
+                    }
+                )
+            }
         }
     }
 }
+
 
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
