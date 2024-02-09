@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.kindstore.R
-import com.example.kindstore.model.ShopInfo
+import com.example.kindstore.model.Shop
 
 @Composable
 fun SearchScreen() {
@@ -97,14 +97,7 @@ fun SearchScreen() {
                 .padding(4.dp)
         )
 
-        val shopInfoList = listOf(
-            ShopInfo("AAA", "메롱동", "이미지 주소"),
-            ShopInfo("AAA", "메롱동", "이미지 주소"),
-            ShopInfo("AAA", "메롱동", "이미지 주소"),
-            ShopInfo("AAA", "메롱동", "이미지 주소"),
-            ShopInfo("AAA", "메롱동", "이미지 주소"),
-        )
-        SearchResults(shopInfoList, modifier = Modifier.weight(1f))
+        // SearchResults(, modifier = Modifier.weight(1f))
     }
 
 }
@@ -144,7 +137,7 @@ private fun CategoryDropdownMenu(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SearchResults(searchedShopList: List<ShopInfo>, modifier: Modifier = Modifier) {
+private fun SearchResults(searchedShopList: List<Shop>, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier) {
         items(searchedShopList.size) { index ->
             ShopCard(shopInfo = searchedShopList[index])
@@ -154,7 +147,7 @@ private fun SearchResults(searchedShopList: List<ShopInfo>, modifier: Modifier =
 
 
 @Composable
-private fun ShopCard(shopInfo: ShopInfo, modifier: Modifier = Modifier) {
+private fun ShopCard(shopInfo: Shop, modifier: Modifier = Modifier) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -168,7 +161,7 @@ private fun ShopCard(shopInfo: ShopInfo, modifier: Modifier = Modifier) {
             // TODO : 이미지 관련 처리 필요
             Image(
                 painter = painterResource(id = R.drawable.my_location),
-                contentDescription = "${shopInfo.title} 가게 이미지",
+                contentDescription = "${shopInfo.name} 가게 이미지",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(80.dp)
@@ -178,7 +171,7 @@ private fun ShopCard(shopInfo: ShopInfo, modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                Text(text = shopInfo.title, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Text(text = shopInfo.name, fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = shopInfo.address, fontSize = 14.sp)
             }
