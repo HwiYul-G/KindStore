@@ -71,4 +71,6 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.6")
     // NavigationBar
     implementation("androidx.compose.material:material:1.6.1")
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
 }
