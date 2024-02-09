@@ -3,6 +3,7 @@ package com.example.kindstore.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,11 +47,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.kindstore.NavigationItem
 import com.example.kindstore.R
 import com.example.kindstore.model.Shop
+import com.example.kindstore.model.ShopRepo
+import com.example.kindstore.model.shops
 
 @Composable
-fun SearchScreen() {
+fun SearchScreen(navController : NavHostController) {
     Column(
         modifier = Modifier
             .padding(4.dp)
@@ -97,7 +103,7 @@ fun SearchScreen() {
                 .padding(4.dp)
         )
 
-        // SearchResults(, modifier = Modifier.weight(1f))
+        SearchResults(ShopRepo.getShops(), navController, modifier = Modifier.weight(1f))
     }
 
 }
@@ -137,21 +143,29 @@ private fun CategoryDropdownMenu(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SearchResults(searchedShopList: List<Shop>, modifier: Modifier = Modifier) {
+private fun SearchResults(searchedShopList: List<Shop>, navController : NavHostController, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier) {
         items(searchedShopList.size) { index ->
-            ShopCard(shopInfo = searchedShopList[index])
+            ShopCard(shopInfo = searchedShopList[index],
+                onItemClick = {
+                    navController.navigate("${NavigationItem.Search.route}/${shops[index].id}")
+                })
         }
     }
 }
 
 
 @Composable
-private fun ShopCard(shopInfo: Shop, modifier: Modifier = Modifier) {
+private fun ShopCard(
+    shopInfo: Shop,
+    onItemClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp)
+            .clickable { onItemClick() }
     ) {
         Row(
             modifier = Modifier
@@ -275,5 +289,5 @@ private fun LocationDropdownMenu(locations: Array<String>, modifier: Modifier = 
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun PreviewSearchScreen() {
-    SearchScreen()
+    SearchScreen(navController = rememberNavController())
 }
