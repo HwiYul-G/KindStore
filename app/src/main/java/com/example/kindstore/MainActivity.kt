@@ -3,6 +3,7 @@ package com.example.kindstore
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
@@ -11,6 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.kindstore.ui.theme.KindStoreTheme
 
@@ -34,12 +36,22 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-    val items = listOf(BottomNavigationItem.Home, BottomNavigationItem.Search, BottomNavigationItem.BookMark)
+    val items = listOf(
+        BottomNavigationItem.Home,
+        BottomNavigationItem.Search,
+        BottomNavigationItem.BookMark
+    )
+    val showBottomNavBar =
+        navController.currentBackStackEntryAsState().value?.destination?.route in items.map { it.route }
     Scaffold(bottomBar = {
-        BottomNavigationBar(
-            navController = navController,
-            items = items,
-        )
+        AnimatedVisibility(
+            visible = showBottomNavBar,
+        ) {
+            BottomNavigationBar(
+                navController = navController,
+                items = items,
+            )
+        }
     }) {
         AppNavHost(
             modifier = Modifier.padding(it),
@@ -47,3 +59,4 @@ fun MainScreen() {
         )
     }
 }
+

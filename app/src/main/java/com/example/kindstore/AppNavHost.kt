@@ -28,7 +28,7 @@ fun AppNavHost(
             HomeScreen()
         }
         composable(NavigationItem.Search.route) {
-            SearchScreen()
+            SearchScreen(navController)
         }
         composable(NavigationItem.BookMark.route) {
             BookmarkScreen()
