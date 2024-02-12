@@ -1,15 +1,18 @@
 package com.example.kindstore.ui
 
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 data class SearchUiState(
     val location : String = "현재 위치",
     val category : String = "",
 )
 
+@HiltViewModel
 class SearchViewModel : ViewModel() {
     // UI 상태 업데이트를 listen하고, 화면 전환에도 데이터 유지하기 위함
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -17,11 +20,15 @@ class SearchViewModel : ViewModel() {
     val uiState : StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     fun updateLocation(location : String) {
-        _uiState.value = _uiState.value
+        _uiState.update { currentState ->
+            currentState.copy(location = location)
+        }
     }
 
     fun updateCategory(category : String) {
-        _uiState.value = _uiState.value
+        _uiState.update { currentState ->
+            currentState.copy(category = category)
+        }
     }
 
     fun getCurrentLocation(){

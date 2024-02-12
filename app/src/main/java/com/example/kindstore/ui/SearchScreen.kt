@@ -48,7 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.kindstore.NavigationItem
@@ -60,9 +60,9 @@ import com.example.kindstore.model.shops
 @Composable
 fun SearchScreen(
     navController: NavHostController,
-    searchViewModel: SearchViewModel = viewModel()
+    viewModel: SearchViewModel = hiltViewModel()
 ) {
-    val searchUiState by searchViewModel.uiState.collectAsState()
+    val searchUiState by viewModel.uiState.collectAsState()
     Column(
         modifier = Modifier
             .padding(4.dp)
@@ -73,7 +73,7 @@ fun SearchScreen(
         if (showLocationDialog.value) {
             LocationSearchDialog(
                 searchUiState.location,
-                searchViewModel,
+                viewModel,
                 onDismissRequest = { showLocationDialog.value = false })
         }
         Row(
@@ -92,7 +92,7 @@ fun SearchScreen(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            CategoryDropdownMenu(searchViewModel, modifier = Modifier.weight(8.5f))
+            CategoryDropdownMenu(viewModel, modifier = Modifier.weight(8.5f))
             IconButton(
                 onClick = { /*TODO searchViewModel.getShopList()*/ },
                 modifier = Modifier
@@ -197,7 +197,7 @@ fun LocationSearchDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = location,
+                        text = "현재 위치", //title
                         fontSize = 18.sp, fontWeight = FontWeight.Bold
                     )
                     IconButton(
@@ -210,7 +210,7 @@ fun LocationSearchDialog(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
-                LocationDropdownMenu(location)
+                LocationDropdownMenu(location, searchViewModel)
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(
@@ -230,7 +230,6 @@ fun LocationSearchDialog(
                         }
                     }
                     Button(onClick = {
-                        searchViewModel.updateLocation(location)
                         onDismissRequest()
                     }) {
                         Text(text = "확인")
@@ -243,7 +242,7 @@ fun LocationSearchDialog(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LocationDropdownMenu(location: String, modifier: Modifier = Modifier) {
+private fun LocationDropdownMenu(location: String, searchViewModel: SearchViewModel, modifier: Modifier = Modifier) {
     var isExpanded by remember { mutableStateOf(false) }
     var selectedLocation by remember { mutableStateOf(location) }
     ExposedDropdownMenuBox(
@@ -252,9 +251,10 @@ private fun LocationDropdownMenu(location: String, modifier: Modifier = Modifier
         modifier = modifier
     ) {
         TextField(
-            value = location,
+            value = selectedLocation,
             onValueChange = {
                 selectedLocation = it
+                searchViewModel.updateLocation(it)
             },
             readOnly = true,
             trailingIcon = {
