@@ -1,4 +1,4 @@
-package com.example.kindstore.ui
+package com.example.kindstore.ui.search
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

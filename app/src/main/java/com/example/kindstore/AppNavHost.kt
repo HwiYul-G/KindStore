@@ -7,10 +7,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.kindstore.ui.BookmarkScreen
-import com.example.kindstore.ui.HomeScreen
-import com.example.kindstore.ui.SearchScreen
-import com.example.kindstore.ui.ShopDetail
+import com.example.kindstore.ui.bookmark.BookmarkScreen
+import com.example.kindstore.ui.home.HomeScreen
+import com.example.kindstore.ui.search.SearchScreen
+import com.example.kindstore.ui.search.ShopDetail
 
 // Step2 : Screens을 가진 NavHost 정의
 @Composable

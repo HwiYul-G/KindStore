@@ -1,4 +1,4 @@
-package com.example.kindstore.ui
+package com.example.kindstore.ui.home
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
